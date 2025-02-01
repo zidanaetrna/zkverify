@@ -7,7 +7,11 @@ curl -s https://raw.githubusercontent.com/zidanaetrna/unichain/refs/heads/main/b
 
 # Update system and install required packages
 echo "Updating system and installing dependencies..."
-apt update && apt install -y docker.io docker-compose jq sed
+apt update && apt install -y docker-compose jq sed
+
+# Install Docker without containerd.io conflict
+echo "Installing Docker..."
+apt install -y docker.io --no-install-recommends
 
 # Prompt user for the new username
 echo "Please enter the username you want to create:"
@@ -22,8 +26,7 @@ usermod -aG docker "$NEW_USER"
 echo "User $NEW_USER has been created and added to the Docker group."
 
 # Switch to the new user and run commands
-sudo -u "$NEW_USER" bash <<EOF
-cd ~
+su - "$NEW_USER" <<EOF
 echo "Cloning ZkVerify repository..."
 git clone https://github.com/zkVerify/compose-zkverify-simplified.git
 cd compose-zkverify-simplified
