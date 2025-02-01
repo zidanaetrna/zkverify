@@ -38,14 +38,15 @@ usermod -aG docker "$NEW_USER"
 
 echo "User $NEW_USER has been created and added to the Docker group."
 
-# Switch to the new user and run commands using sudo
-sudo -i -u "$NEW_USER" bash <<EOF
+# Switch to the new user and run commands interactively
+sudo -u "$NEW_USER" -i bash <<EOF
 echo "Cloning ZkVerify repository..."
 git clone https://github.com/zkVerify/compose-zkverify-simplified.git
 cd compose-zkverify-simplified
 
 echo "Running initialization script..."
-./scripts/init.sh
+# Auto-select option 2 (validator-node)
+echo "2" | ./scripts/init.sh
 
 echo "Starting the ZkVerify node..."
 ./scripts/start.sh
