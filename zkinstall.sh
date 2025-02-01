@@ -18,8 +18,14 @@ else
     echo "Docker is already installed, skipping Docker installation."
 fi
 
-# Prompt user for the username
-read -p "Please enter the username you want to create: " NEW_USER
+# Prompt user for the username with a fallback to command substitution for non-interactive environments
+if [ -t 0 ]; then
+    # Interactive shell
+    read -p "Please enter the username you want to create: " NEW_USER
+else
+    # Non-interactive shell (use default or exit)
+    NEW_USER=${NEW_USER:-}
+fi
 
 # Ensure the username is not empty
 if [[ -z "$NEW_USER" ]]; then
