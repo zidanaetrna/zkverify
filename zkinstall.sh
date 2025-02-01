@@ -9,16 +9,20 @@ curl -s https://raw.githubusercontent.com/zidanaetrna/unichain/refs/heads/main/b
 echo "Updating system and installing dependencies..."
 apt update && apt install -y docker-compose jq sed
 
-# Check if Docker is already installed and if 'docker' command works
+# Check if Docker is installed
 if ! command -v docker &>/dev/null; then
     echo "Docker not found, installing Docker..."
     apt install -y docker.io --no-install-recommends
 else
-    echo "Docker is already installed, skipping Docker installation."
+    echo "Docker is already installed, skipping installation."
 fi
 
-# Prompt user for the username
-read -p "Please enter the username you want to create: " NEW_USER
+# Set username from argument or prompt for input
+if [[ -z "$1" ]]; then
+    read -p "Please enter the username you want to create: " NEW_USER
+else
+    NEW_USER="$1"
+fi
 
 # Ensure the username is not empty
 if [[ -z "$NEW_USER" ]]; then
@@ -29,13 +33,13 @@ fi
 # Create the new user
 echo "Creating user: $NEW_USER..."
 useradd -m -s /bin/bash "$NEW_USER"
-echo "$NEW_USER:password" | chpasswd  # Set a default password (change as needed)
+echo "$NEW_USER:password" | chpasswd  # Set default password (change as needed)
 usermod -aG docker "$NEW_USER"
 
 echo "User $NEW_USER has been created and added to the Docker group."
 
 # Switch to the new user and run commands using sudo
-sudo -u "$NEW_USER" bash <<EOF
+sudo -i -u "$NEW_USER" bash <<EOF
 echo "Cloning ZkVerify repository..."
 git clone https://github.com/zkVerify/compose-zkverify-simplified.git
 cd compose-zkverify-simplified
