@@ -18,17 +18,15 @@ else
     echo "Docker is already installed, skipping Docker installation."
 fi
 
-# Prompt user for the new username
-while true; do
-    echo "Please enter the username you want to create:"
-    read -r NEW_USER
-    # Check if the username is not empty
-    if [[ -z "$NEW_USER" ]]; then
-        echo "Username cannot be empty, please enter a valid username."
-    else
-        break
-    fi
-done
+# Prompt user for the new username and wait for input
+echo "Please enter the username you want to create:"
+read -r NEW_USER
+
+# Ensure the username is not empty
+if [[ -z "$NEW_USER" ]]; then
+    echo "Error: Username cannot be empty!"
+    exit 1
+fi
 
 # Create the new user
 echo "Creating user: $NEW_USER..."
