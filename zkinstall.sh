@@ -34,9 +34,21 @@ fi
 if id "$NEW_USER" &>/dev/null; then
     echo "User $NEW_USER already exists. Skipping user creation."
 else
+    # Prompt for a password
+    read -s -p "Enter a password for $NEW_USER: " PASSWORD
+    echo
+    read -s -p "Confirm password: " PASSWORD_CONFIRM
+    echo
+
+    # Check if passwords match
+    if [[ "$PASSWORD" != "$PASSWORD_CONFIRM" ]]; then
+        echo "Error: Passwords do not match!"
+        exit 1
+    fi
+
     echo "Creating user: $NEW_USER..."
     useradd -m -s /bin/bash "$NEW_USER"
-    echo "$NEW_USER:password" | chpasswd  # Set default password (change as needed)
+    echo "$NEW_USER:$PASSWORD" | chpasswd  # Set user password
     usermod -aG docker "$NEW_USER"
     echo "User $NEW_USER has been created and added to the Docker group."
 fi
