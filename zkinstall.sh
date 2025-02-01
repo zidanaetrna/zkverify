@@ -9,9 +9,14 @@ curl -s https://raw.githubusercontent.com/zidanaetrna/unichain/refs/heads/main/b
 echo "Updating system and installing dependencies..."
 apt update && apt install -y docker-compose jq sed
 
-# Install Docker without containerd.io conflict
-echo "Installing Docker..."
-apt install -y docker.io --no-install-recommends
+# Check if Docker is installed
+if ! command -v docker &>/dev/null; then
+    echo "Docker not found, installing Docker..."
+    # Install Docker only if it doesn't exist
+    apt install -y docker.io --no-install-recommends
+else
+    echo "Docker is already installed, skipping Docker installation."
+fi
 
 # Prompt user for the new username
 echo "Please enter the username you want to create:"
