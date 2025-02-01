@@ -9,10 +9,10 @@ curl -s https://raw.githubusercontent.com/zidanaetrna/unichain/refs/heads/main/b
 echo "Updating system and installing dependencies..."
 apt update && apt install -y docker-compose jq sed
 
-# Check if Docker is installed
+# Check if Docker is already installed and if 'docker' command works
 if ! command -v docker &>/dev/null; then
     echo "Docker not found, installing Docker..."
-    # Install Docker only if it doesn't exist
+    # Install Docker only if it doesn't exist, skipping containerd.io to avoid conflicts
     apt install -y docker.io --no-install-recommends
 else
     echo "Docker is already installed, skipping Docker installation."
