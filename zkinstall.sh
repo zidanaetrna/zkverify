@@ -18,9 +18,8 @@ else
     echo "Docker is already installed, skipping Docker installation."
 fi
 
-# Prompt user for the new username and wait for input
-echo "Please enter the username you want to create:"
-read -r NEW_USER
+# Set username directly here instead of prompting for input
+NEW_USER="your_desired_username_here"
 
 # Ensure the username is not empty
 if [[ -z "$NEW_USER" ]]; then
