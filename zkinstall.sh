@@ -12,20 +12,13 @@ apt update && apt install -y docker-compose jq sed
 # Check if Docker is already installed and if 'docker' command works
 if ! command -v docker &>/dev/null; then
     echo "Docker not found, installing Docker..."
-    # Install Docker only if it doesn't exist, skipping containerd.io to avoid conflicts
     apt install -y docker.io --no-install-recommends
 else
     echo "Docker is already installed, skipping Docker installation."
 fi
 
-# Prompt user for the username with a fallback to command substitution for non-interactive environments
-if [ -t 0 ]; then
-    # Interactive shell
-    read -p "Please enter the username you want to create: " NEW_USER
-else
-    # Non-interactive shell (use default or exit)
-    NEW_USER=${NEW_USER:-}
-fi
+# Prompt user for the username
+read -p "Please enter the username you want to create: " NEW_USER
 
 # Ensure the username is not empty
 if [[ -z "$NEW_USER" ]]; then
@@ -41,8 +34,8 @@ usermod -aG docker "$NEW_USER"
 
 echo "User $NEW_USER has been created and added to the Docker group."
 
-# Switch to the new user and run commands
-su - "$NEW_USER" <<EOF
+# Switch to the new user and run commands using sudo
+sudo -u "$NEW_USER" bash <<EOF
 echo "Cloning ZkVerify repository..."
 git clone https://github.com/zkVerify/compose-zkverify-simplified.git
 cd compose-zkverify-simplified
