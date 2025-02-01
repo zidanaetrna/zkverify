@@ -30,23 +30,28 @@ if [[ -z "$NEW_USER" ]]; then
     exit 1
 fi
 
-# Create the new user
-echo "Creating user: $NEW_USER..."
-useradd -m -s /bin/bash "$NEW_USER"
-echo "$NEW_USER:password" | chpasswd  # Set default password (change as needed)
-usermod -aG docker "$NEW_USER"
+# Check if the user already exists
+if id "$NEW_USER" &>/dev/null; then
+    echo "User $NEW_USER already exists. Skipping user creation."
+else
+    echo "Creating user: $NEW_USER..."
+    useradd -m -s /bin/bash "$NEW_USER"
+    echo "$NEW_USER:password" | chpasswd  # Set default password (change as needed)
+    usermod -aG docker "$NEW_USER"
+    echo "User $NEW_USER has been created and added to the Docker group."
+fi
 
-echo "User $NEW_USER has been created and added to the Docker group."
-
-# Switch to the new user and run commands interactively
+# Switch to the user (existing or newly created) and run the commands interactively
 sudo -u "$NEW_USER" -i bash <<EOF
 echo "Cloning ZkVerify repository..."
-git clone https://github.com/zkVerify/compose-zkverify-simplified.git
+if [ ! -d "compose-zkverify-simplified" ]; then
+    git clone https://github.com/zkVerify/compose-zkverify-simplified.git
+fi
 cd compose-zkverify-simplified
 
 echo "Running initialization script..."
-# Auto-select option 2 (validator-node)
-echo "2" | ./scripts/init.sh
+# Run the script interactively to allow user input
+script -q -c "./scripts/init.sh" /dev/null
 
 echo "Starting the ZkVerify node..."
 ./scripts/start.sh
